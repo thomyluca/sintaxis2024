@@ -1,23 +1,31 @@
-inicio args[], argc // en este caso args[0] sería "triángulo", args[1] su base y args[2] su altura
+inicio args[], argc
+
+// Verificación de argumentos
 si (argc == nulo) {
     mostrar "Error: No se proporcionaron argumentos"
     fin
 }
+
+// Definimos variables para la figura, base y altura
 definir figura : palabra = args[0]
+definir base : entero = args[1]
+definir altura : entero = args[2]
+
+// Analizamos qué tipo de figura es
 analizar figura {
     caso "triangulo":
         si (argc != 3) {
             mostrar "Error: Se necesitan 3 argumentos para un triángulo (figura, base, altura)"
             fin
         }
-        definir base : entero = args[1]
-        definir altura : entero = args[2]
         definir area : decimal = (base * altura) / 2
         mostrar "Área del triángulo: "
         mostrar area
-    fin_caso
+        fin_caso
     defecto:
         mostrar "Figura no reconocida"
-    fin_caso
+        fin_caso
 }
+
+// Fin del programa
 fin
