@@ -7,28 +7,28 @@ FILE *yyin;
 %}
 
 /* Sección de definición de patrones */
-DIGITO      [0-9]
-LETRA       [a-zA-Z]
-SIMBOLO     [+\-*/=]
-ESPACIOS    [ \t\n]+
-IDENTIFICADOR   {LETRA}({LETRA}|{DIGITO})*
-NUMERO      {DIGITO}+
-COMENTARIO  "//".*
-DELIMITADOR [(){}:]
+DIGITO   [0-9]
+LETRA    [a-zA-Z]
+SIMBOLO  [+\-*\/=]
+ESPACIOS [ \t\n]+
+IDENTIFICADOR {LETRA}({LETRA}|{DIGITO})*
+NUMERO   {DIGITO}+ 
+COMENTARIO    "//".*
+DELIMITADOR [(){}:] 
 TIPO_DATO   "entero"|"decimal"|"palabra"
-PALABRA_RESERVADA "inicio"|"fin"|"definir"|"calcular"|"mostrar"|"fin_caso"|"nulo"|"caso"|"defecto"
+PALABRA_RESERVADA  ("inicio"|"fin"|"definir"|"calcular"|"mostrar"|"fin_caso"|"nulo"|"caso"|"defecto")
 
 /* Sección de reglas de tokenización */
 %%
-{ESPACIOS}           {/* ignorar espacios */}
-{NUMERO}             { printf("TOKEN NUMERO: %s\n", yytext); }
-{IDENTIFICADOR}      { printf("TOKEN IDENTIFICADOR: %s\n", yytext); }
-{SIMBOLO}            { printf("TOKEN OPERADOR: %s\n", yytext); }
-{COMENTARIO}         {/* ignorar comentarios */}
-{DELIMITADOR}        { printf("TOKEN DELIMITADOR: %s\n", yytext); }
-{TIPO_DATO}          { printf("TOKEN TIPO DE DATO: %s\n", yytext); }
-{PALABRA_RESERVADA}  { printf("TOKEN PALABRA RESERVADA: %s\n", yytext); }
-.                    { printf("TOKEN DESCONOCIDO: %s\n", yytext); }
+{PALABRA_RESERVADA} { printf("TOKEN PALABRA RESERVADA: %s\n", yytext); }
+{TIPO_DATO} { printf("TOKEN TIPO DE DATO: %s\n", yytext); }
+{IDENTIFICADOR} { printf("TOKEN IDENTIFICADOR: %s\n", yytext); }
+{NUMERO} { printf("TOKEN NUMERO: %s\n", yytext); }
+{SIMBOLO} { printf("TOKEN OPERADOR: %s\n", yytext); }
+{DELIMITADOR} { printf("TOKEN DELIMITADOR: %s\n", yytext); }
+{COMENTARIO} { /* ignorar comentarios */ }
+{ESPACIOS} { /* ignorar espacios */ }
+. { printf("TOKEN DESCONOCIDO: %s\n", yytext); }
 %%
 
 /* Función principal */
