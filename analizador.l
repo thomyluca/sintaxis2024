@@ -18,8 +18,6 @@ DELIMITADOR [(){}:\[\],]
 TIPO_DATO   "entero"|"decimal"|"palabra"
 PALABRA_RESERVADA  ("inicio"|"fin"|"definir"|"calcular"|"mostrar"|"fin_caso"|"nulo"|"caso"|"defecto")
 COMILLA   \"
-PARENTESIS_IZQ  \(
-PARENTESIS_DER  \)
 
 /* Sección de reglas de tokenización */
 %%
@@ -30,13 +28,15 @@ PARENTESIS_DER  \)
 {NUMERO} { printf("TOKEN NUMERO: %s\n", yytext); }
 {SIMBOLO} { printf("TOKEN OPERADOR: %s\n", yytext); }
 {DELIMITADOR} { printf("TOKEN DELIMITADOR: %s\n", yytext); }
-{PARENTESIS_IZQ} { printf("TOKEN PARENTESIS IZQUIERDO: %s\n", yytext); }
-{PARENTESIS_DER} { printf("TOKEN PARENTESIS DERECHO: %s\n", yytext); }
 {COMENTARIO} { /* ignorar comentarios */ }
 {ESPACIOS} { /* ignorar espacios */ }
 {COMILLA} { printf("TOKEN COMILLA: %s\n", yytext); }
 . { printf("TOKEN DESCONOCIDO: %s\n", yytext); }
 %%
+
+int yywrap() {
+    return 1;
+}
 
 void iniciar_analizador() {
     yylex();
