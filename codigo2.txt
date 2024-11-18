@@ -1,0 +1,20 @@
+inicio
+
+definir figura : palabra = args[0];
+analizar figura {
+    caso "triangulo":
+        definir base : entero = args[1];
+        definir altura : entero = args[2];
+        calcular area = (base * altura) / 2;
+        mostrar "Area del triangulo: ";
+    fin_caso
+    caso "circulo":
+        definir radio : decimal = args[1];
+        calcular area = radio * radio * 3;
+    fin_caso
+    defecto:
+        mostrar "Figura no reconocida";
+    fin_caso
+}
+
+fin

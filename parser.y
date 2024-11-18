@@ -1,98 +1,129 @@
 %{
+int yylex();
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-extern int yylex();
-extern int yyparse();
-extern FILE *yyin;
+extern FILE* yyin;
 
-void yyerror(const char *s) {
-    fprintf(stderr, "Error: %s\n", s);
-}
-
-// Declaración de la función iniciar_analizador
-void iniciar_analizador();
+#define YYERROR_VERBOSE 1
 %}
 
+%token INICIO FIN MOSTRAR CALCULAR ANALIZAR FIN_CASO CASO ENTERO DECIMAL DEFINIR ASIGNACION NULO DEFECTO PALABRA ARGUMENTO 
+%token PUNTOYCOMA DOS_PUNTOS OP_DIVISION OP_PRODUCTO OP_RESTA OP_SUMA LLAVE_DERECHA LLAVE_IZQUIERDA PAR_DERECHO PAR_IZQUIERDO COR_IZQUIERDO COR_DERECHO
+%token <id> ID
+%token <numero> NUMERO
+%token <cadena> CADENA
 
-%union {
-    int num;
-    char* str;
+%union{
+    char* id;
+    char* cadena;
+    int numero;
 }
-
-%token <str> INICIO FIN DEFINIR MOSTRAR CASO FIN_CASO DEFECTO
-%token <num> ENTERO DECIMAL NULO
-%token <str> IDENTIFICADOR
-%token <num> NUMERO
-%token MAS MENOS MULT DIV IGUAL
-%token PARENTESIS_IZQ PARENTESIS_DER
 
 %%
 
-// Las reglas de gramática permanecen sin cambios
-Programa:
-    INICIO Instrucciones FIN
-    {
-        printf("Programa válido.\n");
+programa:
+    INICIO sentencias FIN
+;
+
+sentencias:
+    sentencia 
+    | sentencias sentencia
+;
+
+sentencia:
+    sentencia_analizar
+    | sentencia_mostrar PUNTOYCOMA
+    | sentencia_definir PUNTOYCOMA
+    | sentencia_calcular PUNTOYCOMA
+;
+
+sentencia_analizar:
+    ANALIZAR ID LLAVE_IZQUIERDA sentencias_caso LLAVE_DERECHA
+;
+
+sentencias_caso: 
+    lista_casos sentencia_defecto
+    | lista_casos
+;
+
+lista_casos:
+    caso
+    | caso lista_casos
+;
+
+caso:
+    CASO CADENA DOS_PUNTOS sentencias FIN_CASO
+;
+
+sentencia_defecto:
+    DEFECTO DOS_PUNTOS sentencias FIN_CASO
+;
+
+sentencia_calcular:
+    CALCULAR ID ASIGNACION expresion
+;
+
+expresion:
+    termino
+    | expresion OP_SUMA termino
+    | expresion OP_RESTA termino
+;
+
+termino:
+    primaria
+    | termino OP_PRODUCTO primaria
+    | termino OP_DIVISION primaria
+;
+
+primaria:
+    ID
+    | NUMERO
+    | PAR_IZQUIERDO expresion PAR_DERECHO
+;
+
+sentencia_definir:
+    DEFINIR ID DOS_PUNTOS tipo ASIGNACION tipo_definicion
+;
+
+tipo_definicion:
+    expresion
+    | ARGUMENTO
+
+tipo:
+    ENTERO
+    | DECIMAL
+    | PALABRA
+;
+
+sentencia_mostrar:
+    MOSTRAR CADENA
+    | MOSTRAR ID
+;
+
+%%
+
+int yyerror(char *s){
+    printf("Error Sintactico %s \n", s);
+}
+
+int main(int argc, char** argv) {
+    if(argc < 2){
+        printf("NUMERO INCORRECTO DE PARAMETROS");
+        exit(1);
     }
-    ;
 
-Instrucciones:
-    Instruccion Instrucciones
-    |
-    /* vacía */
-    ;
-
-Instruccion:
-    DefinicionVariable
-    | Mostrar
-    | Expresion
-    ;
-
-DefinicionVariable:
-    DEFINIR IDENTIFICADOR IGUAL Expresion
-    {
-        printf("Definición de variable: %s\n", $2);
+    yyin = fopen(argv[1],"r");
+    if(!yyin) {
+        printf("No se pudo abrir el archivo");
+        exit(1);
     }
-    ;
 
-Mostrar:
-    MOSTRAR Expresion
-    {
-        printf("Mostrar: expresión evaluada.\n");
+    if(yyparse() == 0){
+        printf("El codigo fue compilado exitosamente :)");
     }
-    ;
-
-Expresion:
-    Expresion MAS Termino
-    | Expresion MENOS Termino
-    | Termino
-    ;
-
-Termino:
-    Termino MULT Factor
-    | Termino DIV Factor
-    | Factor
-    ;
-
-Factor:
-    NUMERO
-    | IDENTIFICADOR
-    | PARENTESIS_IZQ Expresion PARENTESIS_DER
-    ;
-
-%% 
-
-int main(int argc, char **argv) {
-    if (argc > 1) {
-        yyin = fopen(argv[1], "r");
-        if (!yyin) {
-            perror("No se puede abrir el archivo");
-            return 1;
-        }
-    }
-    iniciar_analizador(); // Llamada a la función de Flex
-    yyparse();
-    fclose(yyin);
+    
     return 0;
 }

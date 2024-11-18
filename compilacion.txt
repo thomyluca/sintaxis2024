@@ -1,0 +1,4 @@
+flex scanner.l
+bison -d parser.y
+gcc -o analizador parser.tab.c lex.yy.c
+./analizador "nombre de archivo"
